@@ -1,0 +1,207 @@
+<style>
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: Verdana, sans-serif;
+    text-align: center;
+    padding: 20px;
+    color: white;
+    background: black;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  
+  h1 {
+    text-decoration: underline;
+    background-color: white;
+    color: black;
+    margin: 5px;
+    padding: 10px 20px;
+  }
+</style>
+<body>
+  <h1>
+    🎵🎵
+  </h1>
+</body>
+<script src="https://unpkg.com/tone"></script>
+<script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js?v=1"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script>
+  /* global Tone, nn, d3, createWaveform, createSpectrum */
+  const amen = 'https://algorithmicmusic.online/audios/amen-break.mp3'
+  const player = new Tone.Player(amen).toDestination();
+  player.volume.value = -9;
+
+  const timecodes = [{
+      offset: 1.8017901897601145,
+      duration: 0.21934837092731851
+    },
+    {
+      offset: 2.0159159804272586,
+      duration: 0.2193483709273183
+    },
+    {
+      offset: 2.2404869316147513,
+      duration: 0.2193483709273183
+    },
+    {
+      offset: 2.4598353025420696,
+      duration: 0.10445160520348473
+    },
+    {
+      offset: 2.55906432748538,
+      duration: 0.12011934598400797
+    },
+    {
+      offset: 2.679183673469388,
+      duration: 0.09922902494331032
+    },
+    {
+      offset: 2.7784126984126982,
+      duration: 0.10445160520348518
+    },
+    {
+      offset: 2.8880868838763574,
+      duration: 0.13056450650435636
+    },
+    {
+      offset: 3.0186513903807137,
+      duration: 0.08878386442296193
+    },
+    {
+      offset: 3.1022126745435017,
+      duration: 0.21412579066714388
+    }
+  ]
+
+  const piano = new Tone.Sampler({
+    baseUrl: 'https://tonejs.github.io/audio/salamander/',
+    urls: {
+      'C4': 'C4.mp3',
+      'D#4': 'Ds4.mp3',
+      'F#4': 'Fs4.mp3',
+      'A4': 'A4.mp3'
+    },
+    release: 1
+  })
+
+  piano.toDestination()
+
+  const keyMap = {
+    q: {
+      note: 'C4',
+      pressed: false
+    },
+    w: {
+      note: 'D4',
+      pressed: false
+    },
+    e: {
+      note: 'E4',
+      pressed: false
+    },
+    r: {
+      note: 'F4',
+      pressed: false
+    },
+    t: {
+      note: 'G4',
+      pressed: false
+    },
+    y: {
+      note: 'A4',
+      pressed: false
+    },
+    u: {
+      note: 'B4',
+      pressed: false
+    },
+    i: {
+      note: 'C5',
+      pressed: false
+    }
+  }
+
+  function attack(e) {
+    const obj = keyMap[e.key]
+    if (obj && !obj.pressed) {
+      piano.triggerAttack(obj.note)
+      obj.pressed = true
+    }
+  }
+
+  function release(e) {
+    const obj = keyMap[e.key]
+    if (obj && obj.pressed) {
+      piano.triggerRelease(obj.note)
+      obj.pressed = false
+    }
+  }
+
+  const ambient = new Tone.Player({
+    url: 'talking-people-6368.mp3',
+    volume: -15,
+    loop: true,
+    autostart: true
+  }).toDestination();
+  
+  let pitch = 0;
+  const flute = new Tone.Player({
+    url: 'flute.wav',
+    volume: -21,
+    loop: true,
+    autostart: true
+  })
+  
+  const pitchShift = new Tone.PitchShift(pitch);
+  flute.connect(pitchShift);
+  
+  pitchShift.toDestination();
+
+  setInterval(() => {
+      if (pitchShift.pitch > 7) {
+    pitchShift.pitch = 0;
+  }
+    pitchShift.pitch += 1;
+  }, 6000);
+  
+  // events listeners
+  nn.on('keydown', attack)
+  nn.on('keyup', release)
+
+  function newPhrase() {
+    const length = Math.floor(nn.random() * 6) + 3;
+
+    const middle = [];
+    for (let i = 0; i < length - 2; i++) {
+      const r = Math.floor(nn.random() * timecodes.length);
+      middle.push(r);
+    }
+
+    return [1, ...middle, 1];
+  }
+
+  function playPhrase(phrase) {
+    const now = Tone.now();
+    for (let i = 0; i < phrase.length; i++) {
+      const tc = timecodes[phrase[i]];
+      const delay = i * 0.21;
+      //player.start(now + delay, tc.offset, tc.duration);
+    }
+  }
+
+  window.addEventListener('load', () => {
+    Tone.start();
+    setInterval(() => {
+      const phrase = newPhrase();
+      playPhrase(phrase);
+    }, 500);
+  });
+</script>

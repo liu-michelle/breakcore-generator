@@ -40,62 +40,105 @@
   //player.volume.value = -9;
 
   const timecodes = [{
-      offset: 0,
+      name: 'bass', offset: 0,
       duration: 0.1680642857142857
     },
     {
-      offset: 0.3475875,
+      name: 'kick',offset: 0.3475875,
       duration: 0.17570357142857135
     },
     {
-      offset: 0.5194714285714285,
+      name: 'snare',offset: 0.5194714285714285,
       duration: 0.878517857142857
     },
     {
-      offset: 2.7921589285714283,
+      name: 'cymbal',offset: 2.7921589285714283,
       duration: 0.33230892857142846
     },
     {
-      offset: 4.1977875,
-      duration: 0.33612857142857155
-    },
-    {
-      offset: 4.545375,
+      name: 'snare1', offset: 4.545375,
       duration: 1.0656803571428561
     }
   ]
+  
+const patterns = [
+  ["bass", "bass", "kick", "snare", "bass", "kick", "snare", "cymbal"],
 
-  function newPhrase() {
+  ["bass", "kick", "snare", "kick", "kick", "snare", "kick", "snare"],
+
+  ["kick", "kick", "snare", "snare1", "bass", "kick", "snare", "bass", "cymbal"],
+
+  ["bass", "kick", "snare", "snare", "kick", "snare1", "kick", "snare", "cymbal"],
+
+  ["snare1", "kick", "kick", "bass", "snare", "kick", "snare", "bass", "cymbal"]
+];
+
+
+  function getPatternTimecodes(pattern) {
+  return pattern.map(name => {
+    const match = timecodes.find(tc => tc.name === name);
+    return match;
+  });
+}
+
+/*  function newPhrase() {
     const length = Math.floor(nn.random() * 6) + 3;
-
     const phrase = [];
     for (let i = 0; i < length; i++) {
       const r = Math.floor(nn.random() * timecodes.length);
-
-
       const base = timecodes[r];
 
       phrase.push(base);
     }
 
     return [1, ...phrase, 1];
+  }*/
+
+function playPhrase(pattern) {
+  const phrase = getPatternTimecodes(pattern);
+  let currentTime = Tone.now();
+
+  for (let i = 0; i < phrase.length; i++) {
+    const tc = phrase[i];
+    player.start(currentTime, tc.offset, tc.duration);
+    currentTime += tc.duration;
+  }
+}
+
+window.addEventListener('load', () => {
+  Tone.start();
+  const amen = 'bassport_amen.wav';
+  const player = new Tone.Player(amen, () => {
+    playNextPhrase();
+  }).toDestination();
+  function getPhraseDuration(pattern) {
+    const phrase = getPatternTimecodes(pattern);
+    let totalDuration = 0;
+    phrase.forEach(tc => {
+      totalDuration += tc.duration;
+    });
+
+    return totalDuration;
   }
 
-  function playPhrase(phrase) {
-    const now = Tone.now();
-    for (let i = 0; i < phrase.length; i++) {
-      const tc = phrase[i];
-      const delay = i * 0.25;
-      player.start(now + delay, tc.offset, tc.duration);
-    }
+  function playNextPhrase() {
+    const randomIndex = Math.floor(Math.random() * patterns.length);
+    const phrase = patterns[randomIndex];
+    playPhrase(phrase);
+
+    const phraseDuration = getPhraseDuration(phrase);
+    setTimeout(playNextPhrase, phraseDuration * 1000);
   }
 
+  function playPhrase(pattern) {
+    const phrase = getPatternTimecodes(pattern);
+    let currentTime = Tone.now();
 
-  window.addEventListener('load', () => {
-    Tone.start();
-    setInterval(() => {
-      const phrase = newPhrase();
-      playPhrase(phrase);
-    }, 500);
-  });
+    phrase.forEach(tc => {
+      player.start(currentTime, tc.offset, tc.duration);
+      currentTime += tc.duration;
+    });
+  }
+});
+
 </script>

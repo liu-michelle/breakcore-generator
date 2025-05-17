@@ -37,7 +37,7 @@
   /* global Tone, nn, d3, createWaveform, createSpectrum */
   const amen = 'bassport_amen.wav';
   const player = new Tone.Player(amen).toDestination();
-  //player.volume.value = -9;
+  player.volume.value = -9;
 
   const timecodes = [{
       name: 'bass', offset: 0,
@@ -108,9 +108,12 @@ function playPhrase(pattern) {
 window.addEventListener('load', () => {
   Tone.start();
   const amen = 'bassport_amen.wav';
+  const effect = new Tone.AutoPanner().start()
   const player = new Tone.Player(amen, () => {
     playNextPhrase();
-  }).toDestination();
+  })
+  player.connect(effect)
+effect.toDestination();
   function getPhraseDuration(pattern) {
     const phrase = getPatternTimecodes(pattern);
     let totalDuration = 0;

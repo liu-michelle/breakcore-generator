@@ -1,147 +1,138 @@
-<style>
-  html,
-  body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Breakcore Generator</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
 
-  body {
-    font-family: Verdana, sans-serif;
-    text-align: center;
-    padding: 20px;
-    color: white;
-    background: black;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-  }
+    body {
+      font-family: Verdana, sans-serif;
+      text-align: center;
+      padding: 20px;
+      color: white;
+      background: black;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
 
-  h1 {
-    text-decoration: underline;
-    background-color: white;
-    color: black;
-    margin: 5px;
-    padding: 10px 20px;
-  }
-</style>
+    h1 {
+      color: white;
+      margin: 5px;
+      padding: 10px 20px;
+    }
+
+    canvas {
+      display: block;
+      margin: 20px auto;
+      background: rgba(255, 255, 255, 0);
+    }
+  </style>
+</head>
 <body>
-  <h1>
-    🎵🎵
-  </h1>
-</body>
-<script src="https://unpkg.com/tone"></script>
-<script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js?v=1"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script>
-  /* global Tone, nn, d3, createWaveform, createSpectrum */
-  const amen = 'bassport_amen.wav';
-  const player = new Tone.Player(amen).toDestination();
-  player.volume.value = -9;
+  <h1>breakcore generator</h1>
+  <canvas id="visuals" width="800" height="600"></canvas>
 
-  const timecodes = [{
-      name: 'bass', offset: 0,
-      duration: 0.1680642857142857
-    },
-    {
-      name: 'kick',offset: 0.3475875,
-      duration: 0.17570357142857135
-    },
-    {
-      name: 'snare',offset: 0.5194714285714285,
-      duration: 0.878517857142857
-    },
-    {
-      name: 'cymbal',offset: 2.7921589285714283,
-      duration: 0.33230892857142846
-    },
-    {
-      name: 'snare1', offset: 4.545375,
-      duration: 1.0656803571428561
-    }
-  ]
-  
-const patterns = [
-  ["bass", "bass", "kick", "snare", "bass", "kick", "snare", "cymbal"],
+  <script src="https://unpkg.com/tone"></script>
+  <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js?v=1"></script>
+  <script>
+    const canvas = document.getElementById('visuals');
+    const ctx = canvas.getContext('2d');
 
-  ["bass", "kick", "snare", "kick", "kick", "snare", "kick", "snare"],
+    function drawCircle(r,g,b) {
+      const x = canvas.width / 2 + (Math.random()) * 200;
+      const y = canvas.height / 2 + (Math.random()) * 200;
+      const radius = 200 * Math.random();
+      let opacity = 1;
 
-  ["kick", "kick", "snare", "snare1", "bass", "kick", "snare", "bass", "cymbal"],
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.arc(x, y, radius * Math.random(0.5,1), 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+        ctx.lineWidth = 30 * Math.random();
+        ctx.stroke();
 
-  ["bass", "kick", "snare", "snare", "kick", "snare1", "kick", "snare", "cymbal"],
+        opacity -= 0.02;
+        if (opacity > 0) requestAnimationFrame(animate);
+      }
 
-  ["snare1", "kick", "kick", "bass", "snare", "kick", "snare", "bass", "cymbal"]
-];
-
-
-  function getPatternTimecodes(pattern) {
-  return pattern.map(name => {
-    const match = timecodes.find(tc => tc.name === name);
-    return match;
-  });
-}
-
-/*  function newPhrase() {
-    const length = Math.floor(nn.random() * 6) + 3;
-    const phrase = [];
-    for (let i = 0; i < length; i++) {
-      const r = Math.floor(nn.random() * timecodes.length);
-      const base = timecodes[r];
-
-      phrase.push(base);
+      animate();
     }
 
-    return [1, ...phrase, 1];
-  }*/
+    const amen = 'bassport_amen.wav';
+    const timecodes = [
+      { name: 'bass', offset: 0, duration: 0.168 },
+      { name: 'kick', offset: 0.347, duration: 0.176 },
+      { name: 'snare', offset: 0.519, duration: 0.879 },
+      { name: 'cymbal', offset: 2.792, duration: 0.332 },
+      { name: 'snare1', offset: 4.545, duration: 1.066 }
+    ];
+
+    const patterns = [
+      ["bass", "bass", "kick", "snare", "bass", "kick", "snare", "cymbal"],
+      ["bass", "kick", "snare", "kick", "kick", "snare", "kick", "snare"],
+      ["kick", "kick", "snare", "snare1", "bass", "kick", "snare", "bass", "cymbal"],
+      ["bass", "kick", "snare", "snare", "kick", "snare1", "kick", "snare", "cymbal"],
+      ["snare1", "kick", "kick", "bass", "snare", "kick", "snare", "bass", "cymbal"]
+    ];
+
+    function getPatternTimecodes(pattern) {
+      return pattern.map(name => timecodes.find(tc => tc.name === name));
+    }
+
+    window.addEventListener('load', async () => {
+      await Tone.start();
+      const effect = new Tone.Distortion();
+      const player = new Tone.Player(amen, () => {
+        playNextPhrase();
+      });
+      player.volume.value = -9;
+      player.connect(effect);
+      effect.toDestination();
+
+      function getPhraseDuration(pattern) {
+        return getPatternTimecodes(pattern).reduce((sum, tc) => sum + tc.duration, 0);
+      }
 
 function playPhrase(pattern) {
   const phrase = getPatternTimecodes(pattern);
-  let currentTime = Tone.now();
+  let time = 0;
 
-  for (let i = 0; i < phrase.length; i++) {
-    const tc = phrase[i];
-    player.start(currentTime, tc.offset, tc.duration);
-    currentTime += tc.duration;
-  }
+  phrase.forEach(tc => {
+    const localTime = time;
+
+    Tone.Transport.schedule((t) => {
+      player.start(t, tc.offset, tc.duration);
+      r = Math.random() * 255;
+      g = Math.random() * 255;
+      b = Math.random() * 255;
+      drawCircle(r, g, b);
+    }, `+${localTime}`);
+
+    time += tc.duration;
+  });
+
+  Tone.Transport.start();
 }
 
-window.addEventListener('load', () => {
-  Tone.start();
-  const amen = 'bassport_amen.wav';
-  const effect = new Tone.AutoPanner().start()
-  const player = new Tone.Player(amen, () => {
-    playNextPhrase();
-  })
-  player.connect(effect)
-effect.toDestination();
-  function getPhraseDuration(pattern) {
-    const phrase = getPatternTimecodes(pattern);
-    let totalDuration = 0;
-    phrase.forEach(tc => {
-      totalDuration += tc.duration;
+
+      function playNextPhrase() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const randomIndex = Math.floor(Math.random() * patterns.length);
+        const phrase = patterns[randomIndex];
+        playPhrase(phrase);
+
+        const phraseDuration = getPhraseDuration(phrase);
+        setTimeout(playNextPhrase, phraseDuration * 1000);
+      }
     });
-
-    return totalDuration;
-  }
-
-  function playNextPhrase() {
-    const randomIndex = Math.floor(Math.random() * patterns.length);
-    const phrase = patterns[randomIndex];
-    playPhrase(phrase);
-
-    const phraseDuration = getPhraseDuration(phrase);
-    setTimeout(playNextPhrase, phraseDuration * 1000);
-  }
-
-  function playPhrase(pattern) {
-    const phrase = getPatternTimecodes(pattern);
-    let currentTime = Tone.now();
-
-    phrase.forEach(tc => {
-      player.start(currentTime, tc.offset, tc.duration);
-      currentTime += tc.duration;
-    });
-  }
-});
-
-</script>
+  </script>
+</body>
+</html>

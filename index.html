@@ -1,138 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Breakcore Generator</title>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: Verdana, sans-serif;
-      text-align: center;
-      padding: 20px;
-      color: white;
-      background: black;
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
-    }
-
-    h1 {
-      color: white;
-      margin: 5px;
-      padding: 10px 20px;
-    }
-
-    canvas {
-      display: block;
-      margin: 20px auto;
-      background: rgba(255, 255, 255, 0);
-    }
-  </style>
-</head>
-<body>
-  <h1>breakcore generator</h1>
-  <canvas id="visuals" width="800" height="600"></canvas>
-
-  <script src="https://unpkg.com/tone"></script>
-  <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js?v=1"></script>
-  <script>
-    const canvas = document.getElementById('visuals');
-    const ctx = canvas.getContext('2d');
-
-    function drawCircle(r,g,b) {
-      const x = canvas.width / 2 + (Math.random()) * 200;
-      const y = canvas.height / 2 + (Math.random()) * 200;
-      const radius = 200 * Math.random();
-      let opacity = 1;
-
-      function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
-        ctx.arc(x, y, radius * Math.random(0.5,1), 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
-        ctx.lineWidth = 30 * Math.random();
-        ctx.stroke();
-
-        opacity -= 0.02;
-        if (opacity > 0) requestAnimationFrame(animate);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>infinity breakcore</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
       }
 
-      animate();
-    }
-
-    const amen = 'bassport_amen.wav';
-    const timecodes = [
-      { name: 'bass', offset: 0, duration: 0.168 },
-      { name: 'kick', offset: 0.347, duration: 0.176 },
-      { name: 'snare', offset: 0.519, duration: 0.879 },
-      { name: 'cymbal', offset: 2.792, duration: 0.332 },
-      { name: 'snare1', offset: 4.545, duration: 1.066 }
-    ];
-
-    const patterns = [
-      ["bass", "bass", "kick", "snare", "bass", "kick", "snare", "cymbal"],
-      ["bass", "kick", "snare", "kick", "kick", "snare", "kick", "snare"],
-      ["kick", "kick", "snare", "snare1", "bass", "kick", "snare", "bass", "cymbal"],
-      ["bass", "kick", "snare", "snare", "kick", "snare1", "kick", "snare", "cymbal"],
-      ["snare1", "kick", "kick", "bass", "snare", "kick", "snare", "bass", "cymbal"]
-    ];
-
-    function getPatternTimecodes(pattern) {
-      return pattern.map(name => timecodes.find(tc => tc.name === name));
-    }
-
-    window.addEventListener('load', async () => {
-      await Tone.start();
-      const effect = new Tone.Distortion();
-      const player = new Tone.Player(amen, () => {
-        playNextPhrase();
-      });
-      player.volume.value = -9;
-      player.connect(effect);
-      effect.toDestination();
-
-      function getPhraseDuration(pattern) {
-        return getPatternTimecodes(pattern).reduce((sum, tc) => sum + tc.duration, 0);
+      body {
+        font-family: Monaco, serif;
+        text-align: center;
+        padding: 20px;
+        color: white;
+        background: black;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
       }
 
-function playPhrase(pattern) {
-  const phrase = getPatternTimecodes(pattern);
-  let time = 0;
+      h1 {
+        color: white;
+        margin: 5px;
+        padding: 10px 20px;
+      }
 
-  phrase.forEach(tc => {
-    const localTime = time;
+      canvas {
+        display: block;
+        margin: 20px auto;
+        background: rgba(255, 255, 255, 0.1);
+        border: 3px solid white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>infinity breakcore</h1>
+    <canvas id="visuals" width="800" height="600"></canvas>
 
-    Tone.Transport.schedule((t) => {
-      player.start(t, tc.offset, tc.duration);
-      r = Math.random() * 255;
-      g = Math.random() * 255;
-      b = Math.random() * 255;
-      drawCircle(r, g, b);
-    }, `+${localTime}`);
+    <script src="https://unpkg.com/tone"></script>
+    <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js?v=1"></script>
+    <script>
+      const canvas = document.getElementById('visuals');
+      const ctx = canvas.getContext('2d');
 
-    time += tc.duration;
-  });
+      function drawCircle(r, g, b) {
+        const x = canvas.width / 2 + (Math.random()) * 200;
+        const y = canvas.height / 2 + (Math.random()) * 200;
+        const radius = 200 * Math.random();
+        let opacity = 1;
 
-  Tone.Transport.start();
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.beginPath();
+          ctx.arc(x, y, radius * Math.random(0.5, 1), 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+          ctx.lineWidth = 30 * Math.random();
+          ctx.stroke();
+
+          opacity -= 0.02;
+          if (opacity > 0) requestAnimationFrame(animate);
+        }
+
+        animate();
+      }
+      
+let r1=0;
+let b1=0;
+let g1=0;
+let neg = 1;
+
+function animateBackground() {
+  r1 += Math.random() * neg;
+  g1 += Math.random() * neg;
+  b1 += Math.random() * neg;
+
+  if (r1 >= 255) {
+    neg = -1
+  }
+  if (r1 <= 0) {
+    neg = 1;
+  }
+
+  canvas.style.backgroundColor = `rgb(${r1}, ${g1}, ${b1})`;
+
+  requestAnimationFrame(animateBackground);
 }
 
+animateBackground();
 
-      function playNextPhrase() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const randomIndex = Math.floor(Math.random() * patterns.length);
-        const phrase = patterns[randomIndex];
-        playPhrase(phrase);
 
-        const phraseDuration = getPhraseDuration(phrase);
-        setTimeout(playNextPhrase, phraseDuration * 1000);
+      const amen = 'bassport_amen.wav';
+      const timecodes = [{
+          name: 'bass',
+          offset: 0,
+          duration: 0.168
+        },
+        {
+          name: 'kick',
+          offset: 0.347,
+          duration: 0.176
+        },
+        {
+          name: 'snare',
+          offset: 0.519,
+          duration: 0.879
+        },
+        {
+          name: 'cymbal',
+          offset: 2.792,
+          duration: 0.332
+        },
+        {
+          name: 'snare1',
+          offset: 4.545,
+          duration: 1.066
+        }
+      ];
+
+      const patterns = [
+        ["bass", "bass", "kick", "snare", "bass", "kick", "snare", "cymbal"],
+        ["bass", "kick", "snare", "kick", "kick", "snare", "kick", "snare"],
+        ["kick", "kick", "snare", "snare1", "bass", "kick", "snare", "bass", "cymbal"],
+        ["bass", "kick", "snare", "snare", "kick", "snare1", "kick", "snare", "cymbal"],
+        ["snare1", "kick", "kick", "bass", "snare", "kick", "snare", "bass", "cymbal"]
+      ];
+
+      function getPatternTimecodes(pattern) {
+        return pattern.map(name => timecodes.find(tc => tc.name === name));
       }
-    });
-  </script>
-</body>
+
+      window.addEventListener('load', async () => {
+        await Tone.start();
+        const effect = new Tone.Distortion();
+        const player = new Tone.Player(amen, () => {
+          playNextPhrase();
+        });
+        player.volume.value = -15;
+        player.connect(effect);
+        effect.toDestination();
+
+        function getPhraseDuration(pattern) {
+          return getPatternTimecodes(pattern).reduce((sum, tc) => sum + tc.duration, 0);
+        }
+
+        function playPhrase(pattern) {
+          const phrase = getPatternTimecodes(pattern);
+          let time = 0;
+
+          phrase.forEach(tc => {
+            const localTime = time;
+
+            Tone.Transport.schedule((t) => {
+              player.start(t, tc.offset, tc.duration);
+              r = Math.random() * 255;
+              g = Math.random() * 255;
+              b = Math.random() * 255;
+              drawCircle(r, g, b);
+            }, `+${localTime}`);
+
+            time += tc.duration;
+          });
+
+          Tone.Transport.start();
+        }
+
+
+        function playNextPhrase() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          const randomIndex = Math.floor(Math.random() * patterns.length);
+          const phrase = patterns[randomIndex];
+          playPhrase(phrase);
+
+          const phraseDuration = getPhraseDuration(phrase);
+          setTimeout(playNextPhrase, phraseDuration * 1000);
+        }
+      });
+    </script>
+  </body>
 </html>

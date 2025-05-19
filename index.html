@@ -40,10 +40,10 @@
   <body>
     <h1>∞ infinity breakcore ∞</h1>
     <canvas id="visuals" width="800" height="600"></canvas>
-
     <script src="https://unpkg.com/tone"></script>
     <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js?v=1"></script>
     <script>
+      /*global Tone*/
       const canvas = document.getElementById('visuals');
       const ctx = canvas.getContext('2d');
 
@@ -132,15 +132,13 @@
 
           phrase.forEach(tc => {
             const localTime = time;
-
             Tone.Transport.schedule((t) => {
               player.start(t, tc.offset, tc.duration);
-              r = Math.random() * 255;
-              g = Math.random() * 255;
-              b = Math.random() * 255;
+              let r = Math.random() * 255;
+              let g = Math.random() * 255;
+              let b = Math.random() * 255;
               drawCircle(r, g, b);
               canvas.style.borderColor = `rgb(${r}, ${g}, ${b})`;
-
             }, `+${localTime}`);
 
 
@@ -149,7 +147,6 @@
 
           Tone.Transport.start();
         }
-
 
         function playNextPhrase() {
           ctx.clearRect(0, 0, canvas.width, canvas.height);

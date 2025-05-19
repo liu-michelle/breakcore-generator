@@ -56,7 +56,7 @@
         const header = document.querySelector("h1");
 
   header.addEventListener("mouseenter", () => {
-    document.body.style.backgroundColor = "white";
+    document.body.style.backgroundColor = "blue";
     document.body.style.color = "black";
   });
 
@@ -92,7 +92,37 @@ ctx.shadowOffsetY = 5;
 
         animate();
       }
+      
+function squares() {
+  const x = Math.random() * (canvas.width - 100);
+  const y = Math.random() * (canvas.height - 100);
+  const size = 200 + Math.random() * 200;
+  let opacity = 1;
 
+  function animate() {
+//    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Shadow
+    ctx.shadowColor = 'rgba(255, 0, 0, 1)';
+    ctx.shadowBlur = 5;
+    ctx.shadowOffsetX = 5;
+    ctx.shadowOffsetY = 5;
+
+    // Square
+    ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+    ctx.fillRect(x, y, size, size);
+
+    opacity -= 0.02;
+    if (opacity > 0) {
+      requestAnimationFrame(animate);
+    }
+  }
+
+  animate();
+}
+
+
+      const ambient = 'breakcore-pad-melody_170bpm.wav';
       const amen = 'bassport_amen.wav';
       const timecodes = [{
           name: 'bass',
@@ -139,14 +169,40 @@ ctx.shadowOffsetY = 5;
 
       window.addEventListener('load', async () => {
         await Tone.start();
-        const effect = new Tone.Distortion();
+        const effect = new Tone.Reverb({ decay: 2, wet: 0.6 });
         const player = new Tone.Player(amen, () => {
           playNextPhrase();
         });
-        player.volume.value = -15;
+        player.volume.value = -5;
         player.connect(effect);
         effect.toDestination();
+        
+        let pitch = 0;
+        const ambientsound = new Tone.Player(ambient);
+        const ambienteffect = new Tone.Distortion();
+        const pitchShift = new Tone.PitchShift(pitch);
+        
+        ambientsound.connect(ambienteffect);
+        ambienteffect.connect(pitchShift);
+        pitchShift.toDestination();
+const loopDuration = 6;
 
+const loop = new Tone.Loop(time => {
+  ambientsound.start(time);
+  squares();
+}, `${loopDuration}`);
+
+loop.start(0);
+Tone.Transport.start();
+        ambientsound.volume.value = -17;
+        
+          setInterval(() => {
+      if (pitchShift.pitch > 3) {
+    pitchShift.pitch = 0;
+  }
+    pitchShift.pitch += 1;
+  }, 4000);
+        
         function getPhraseDuration(pattern) {
           return getPatternTimecodes(pattern).reduce((sum, tc) => sum + tc.duration, 0);
         }

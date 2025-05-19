@@ -48,7 +48,7 @@
     </style>
   </head>
   <body>
-    <h1>infinity breakcore</h1>
+    <h1>inf</h1>
     <canvas id="visuals" width="800" height="600"></canvas>
     <script src="https://unpkg.com/tone"></script>
     <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js?v=1"></script>
@@ -120,6 +120,7 @@
       }
 
       const ambient = 'breakcore-pad-melody_170bpm.wav';
+      const piano = 'looperman-l-2466385-0349921-risen.wav';
       const amen = 'bassport_amen.wav';
       const timecodes = [{
           name: 'bass',
@@ -199,12 +200,16 @@
         ambientsound.volume.value = -3;
 
         setInterval(() => {
-          if (pitchShift.pitch > 3) {
+          if (pitchShift.pitch > 2) {
             pitchShift.pitch = 0;
           }
           pitchShift.pitch += 1;
         }, 4000);
-
+        
+        const pianosound = new Tone.Player(piano).toDestination();
+        pianosound.loop = true;
+        pianosound.autostart = true;
+        pianosound.volume.value = 10;
         function getPhraseDuration(pattern) {
           return getPatternTimecodes(pattern).reduce((sum, tc) => sum + tc.duration, 0);
         }

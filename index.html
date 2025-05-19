@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>∞∞∞∞∞∞</title>
+    <title>infinity breakcore</title>
     <style>
       html,
       body {
@@ -28,6 +28,7 @@
         margin: 5px;
         padding: 10px 20px;
         border: 1px solid white;
+        padding: 20px;
         box-shadow: 0 0 2px 2px rgba(255, 0, 0, 0.7);
       }
 
@@ -94,28 +95,25 @@
       }
 
       function squares() {
-        const x = Math.random() * (canvas.width - 100);
-        const y = Math.random() * (canvas.height - 100);
-        const size = 200 + Math.random() * 200;
+        const x = canvas.width / 2 + (Math.random()) * 200;
+        const y = canvas.height / 2 + (Math.random()) * 200;
+        const radius = 150 * Math.random();
         let opacity = 1;
 
         function animate() {
-          //    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-          // Shadow
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(200,200,200,${opacity})`;
+          ctx.lineWidth = 30;
+          ctx.fill();
           ctx.shadowColor = 'rgba(255, 0, 0, 1)';
           ctx.shadowBlur = 5;
           ctx.shadowOffsetX = 5;
           ctx.shadowOffsetY = 5;
 
-          // Square
-          ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
-          ctx.fillRect(x, y, size, size);
-
           opacity -= 0.02;
-          if (opacity > 0) {
-            requestAnimationFrame(animate);
-          }
+          if (opacity > 0) requestAnimationFrame(animate);
         }
 
         animate();
@@ -172,89 +170,76 @@
           decay: 2,
           wet: 0.6
         });
-        const player = new Tone.Player(amen);
+        const player = new Tone.Player(amen, () => {
+          playNextPhrase();
+        });
         player.volume.value = -5;
         player.connect(effect);
         effect.toDestination();
 
         let pitch = 0;
         const ambientsound = new Tone.Player(ambient);
-        const ambienteffect = new Tone.Distortion();
+        const ambienteffect = new Tone.Reverb();
         const pitchShift = new Tone.PitchShift(pitch);
 
         ambientsound.connect(ambienteffect);
         ambienteffect.connect(pitchShift);
         pitchShift.toDestination();
         const loopDuration = 6;
-        ambientsound.loop = false;
-ambientsound.autostart = false;
 
         const loop = new Tone.Loop(time => {
           ambientsound.start(time);
-        }, `${loopDuration}`);
-        
-                  Tone.Transport.scheduleRepeat(time => {
-            squares(); // draw a square
+          Tone.Transport.scheduleRepeat(time => {
+             squares();
           }, "1n");
+        }, `${loopDuration}`);
 
         loop.start(0);
         Tone.Transport.start();
-        ambientsound.volume.value = -17;
+        ambientsound.volume.value = -3;
 
         setInterval(() => {
           if (pitchShift.pitch > 3) {
-            pitchShift.pitch = 1;
+            pitchShift.pitch = 0;
           }
           pitchShift.pitch += 1;
         }, 4000);
-        playNextPhrase();
 
         function getPhraseDuration(pattern) {
           return getPatternTimecodes(pattern).reduce((sum, tc) => sum + tc.duration, 0);
         }
 
-function playPhrase(pattern) {
-  const phrase = getPatternTimecodes(pattern);
-  let currentTime = Tone.now();
+        function playPhrase(pattern) {
+          const phrase = getPatternTimecodes(pattern);
+          let time = 0;
 
-  phrase.forEach(tc => {
-    player.start(currentTime, tc.offset, tc.duration);
-
-    let r = Math.random() * 255;
-    let g = Math.random() * 255;
-    let b = Math.random() * 255;
-    drawCircle(r, g, b);
-    canvas.style.borderColor = `rgb(${r - 20}, ${g - 20}, ${b - 20})`;
-
-    currentTime += tc.duration;
-  });
-}
+          phrase.forEach(tc => {
+            const localTime = time;
+            Tone.Transport.schedule((t) => {
+              player.start(t, tc.offset, tc.duration);
+              let r = Math.random() * 255;
+              let g = Math.random() * 255;
+              let b = Math.random() * 255;
+              drawCircle(r, g, b);
+              canvas.style.borderColor = `rgb(${r -20}, ${g-20}, ${b - 20})`;
+            }, `+${localTime}`);
 
 
-function playNextPhrase() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+            time += tc.duration;
+          });
 
-  // randomly choose playback mode
-  const modes = ["drums", "melody", "both"];
-  const mode = modes[Math.floor(Math.random() * modes.length)];
+          Tone.Transport.start();
+        }
 
-  const randomIndex = Math.floor(Math.random() * patterns.length);
-  const phrase = getPatternTimecodes(patterns[randomIndex]);
+        function playNextPhrase() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          const randomIndex = Math.floor(Math.random() * patterns.length);
+          const phrase = patterns[randomIndex];
+          playPhrase(phrase);
 
-  if (mode === "drums" || mode === "both") {
-    playPhrase(phrase); // triggers drum playback
-  }
-
-if (mode === "melody" || mode === "both") {
-  ambientsound.stop();  // stop if it was already playing
-  ambientsound.start(); // play from the beginning
-}
-
-
-  const phraseDuration = getPhraseDuration(phrase);
-  setTimeout(playNextPhrase, phraseDuration * 1000);
-}
-
+          const phraseDuration = getPhraseDuration(phrase);
+          setTimeout(playNextPhrase, phraseDuration * 1000);
+        }
       });
     </script>
   </body>

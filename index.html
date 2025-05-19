@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>infinity breakcore ∞</title>
+    <title>∞∞∞infinity breakcore∞∞∞</title>
     <style>
       html,
       body {
@@ -27,6 +27,14 @@
         color: white;
         margin: 5px;
         padding: 10px 20px;
+        border: 1px solid white;
+        box-shadow: 0 0 2px 2px rgba(255, 0, 0, 0.7);
+      }
+      
+      h1:hover {
+        color: black;
+        border: 1px solid black;
+        box-shadow: 0 0 2px 2px rgba(255, 0, 0, 0.7);
       }
 
       canvas {
@@ -34,16 +42,29 @@
         margin: 20px auto;
         background: rgba(255, 255, 255, 0);
         border: 3px solid white;
+        box-shadow: 0 0 2px 2px rgba(255, 0, 0, 0.7);
       }
     </style>
   </head>
   <body>
-    <h1>∞ infinity breakcore ∞</h1>
+    <h1>∞∞∞infinity breakcore∞∞∞</h1>
     <canvas id="visuals" width="800" height="600"></canvas>
     <script src="https://unpkg.com/tone"></script>
     <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js?v=1"></script>
     <script>
       /*global Tone*/
+        const header = document.querySelector("h1");
+
+  header.addEventListener("mouseenter", () => {
+    document.body.style.backgroundColor = "white";
+    document.body.style.color = "black";
+  });
+
+  header.addEventListener("mouseleave", () => {
+    document.body.style.backgroundColor = "black";
+    document.body.style.color = "white";
+  });
+      
       const canvas = document.getElementById('visuals');
       const ctx = canvas.getContext('2d');
 
@@ -60,6 +81,10 @@
           ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
           ctx.lineWidth = 30 * Math.random();
           ctx.stroke();
+          ctx.shadowColor = 'rgba(255, 0, 0, 1)';
+ctx.shadowBlur = 5;
+ctx.shadowOffsetX = 5;
+ctx.shadowOffsetY = 5;   
 
           opacity -= 0.02;
           if (opacity > 0) requestAnimationFrame(animate);
@@ -158,6 +183,7 @@
           setTimeout(playNextPhrase, phraseDuration * 1000);
         }
       });
+      
     </script>
   </body>
 </html>

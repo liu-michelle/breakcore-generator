@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>infinity breakcore</title>
+    <title>infinity breakcore ∞</title>
     <style>
       html,
       body {
@@ -32,13 +32,13 @@
       canvas {
         display: block;
         margin: 20px auto;
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0);
         border: 3px solid white;
       }
     </style>
   </head>
   <body>
-    <h1>infinity breakcore</h1>
+    <h1>∞ infinity breakcore ∞</h1>
     <canvas id="visuals" width="800" height="600"></canvas>
 
     <script src="https://unpkg.com/tone"></script>
@@ -67,31 +67,6 @@
 
         animate();
       }
-      
-let r1=0;
-let b1=0;
-let g1=0;
-let neg = 1;
-
-function animateBackground() {
-  r1 += Math.random() * neg;
-  g1 += Math.random() * neg;
-  b1 += Math.random() * neg;
-
-  if (r1 >= 255) {
-    neg = -1
-  }
-  if (r1 <= 0) {
-    neg = 1;
-  }
-
-  canvas.style.backgroundColor = `rgb(${r1}, ${g1}, ${b1})`;
-
-  requestAnimationFrame(animateBackground);
-}
-
-animateBackground();
-
 
       const amen = 'bassport_amen.wav';
       const timecodes = [{
@@ -126,7 +101,11 @@ animateBackground();
         ["bass", "kick", "snare", "kick", "kick", "snare", "kick", "snare"],
         ["kick", "kick", "snare", "snare1", "bass", "kick", "snare", "bass", "cymbal"],
         ["bass", "kick", "snare", "snare", "kick", "snare1", "kick", "snare", "cymbal"],
-        ["snare1", "kick", "kick", "bass", "snare", "kick", "snare", "bass", "cymbal"]
+        ["snare1", "kick", "kick", "bass", "snare", "kick", "snare", "bass", "cymbal"],
+        ["kick", "snare", "kick", "snare", "kick", "snare1", "kick", "kick", "cymbal"],
+        ["bass", "cymbal", "bass", "cymbal", "snare", "snare", "kick", "kick"],
+        ["snare", "snare", "snare", "snare1", "kick", "snare1", "kick", "kick"],
+        ["cymbal", "cymbal", "kick", "snare", "kick", "snare", "cymbal", "bass"]
       ];
 
       function getPatternTimecodes(pattern) {
@@ -160,7 +139,10 @@ animateBackground();
               g = Math.random() * 255;
               b = Math.random() * 255;
               drawCircle(r, g, b);
+              canvas.style.borderColor = `rgb(${r}, ${g}, ${b})`;
+
             }, `+${localTime}`);
+
 
             time += tc.duration;
           });

@@ -121,7 +121,6 @@ function squares() {
   animate();
 }
 
-
       const ambient = 'breakcore-pad-melody_170bpm.wav';
       const amen = 'bassport_amen.wav';
       const timecodes = [{
@@ -189,7 +188,9 @@ const loopDuration = 6;
 
 const loop = new Tone.Loop(time => {
   ambientsound.start(time);
-  squares();
+            Tone.Transport.scheduleRepeat(time => {
+  squares(); // draw a square
+}, "1n");
 }, `${loopDuration}`);
 
 loop.start(0);

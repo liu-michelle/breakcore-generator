@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>∞∞∞infinity breakcore∞∞∞</title>
+    <title>∞∞∞∞∞∞</title>
     <style>
       html,
       body {
@@ -47,7 +47,7 @@
     </style>
   </head>
   <body>
-    <h1>∞∞∞infinity breakcore∞∞∞</h1>
+    <h1>infinity breakcore</h1>
     <canvas id="visuals" width="800" height="600"></canvas>
     <script src="https://unpkg.com/tone"></script>
     <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js?v=1"></script>
@@ -172,9 +172,7 @@
           decay: 2,
           wet: 0.6
         });
-        const player = new Tone.Player(amen, () => {
-          playNextPhrase();
-        });
+        const player = new Tone.Player(amen);
         player.volume.value = -5;
         player.connect(effect);
         effect.toDestination();
@@ -193,10 +191,11 @@ ambientsound.autostart = false;
 
         const loop = new Tone.Loop(time => {
           ambientsound.start(time);
-          Tone.Transport.scheduleRepeat(time => {
+        }, `${loopDuration}`);
+        
+                  Tone.Transport.scheduleRepeat(time => {
             squares(); // draw a square
           }, "1n");
-        }, `${loopDuration}`);
 
         loop.start(0);
         Tone.Transport.start();
@@ -204,36 +203,33 @@ ambientsound.autostart = false;
 
         setInterval(() => {
           if (pitchShift.pitch > 3) {
-            pitchShift.pitch = 0;
+            pitchShift.pitch = 1;
           }
           pitchShift.pitch += 1;
         }, 4000);
+        playNextPhrase();
 
         function getPhraseDuration(pattern) {
           return getPatternTimecodes(pattern).reduce((sum, tc) => sum + tc.duration, 0);
         }
 
-        function playPhrase(pattern) {
-          const phrase = getPatternTimecodes(pattern);
-          let time = 0;
+function playPhrase(pattern) {
+  const phrase = getPatternTimecodes(pattern);
+  let currentTime = Tone.now();
 
-          phrase.forEach(tc => {
-            const localTime = time;
-            Tone.Transport.schedule((t) => {
-              player.start(t, tc.offset, tc.duration);
-              let r = Math.random() * 255;
-              let g = Math.random() * 255;
-              let b = Math.random() * 255;
-              drawCircle(r, g, b);
-              canvas.style.borderColor = `rgb(${r -20}, ${g-20}, ${b - 20})`;
-            }, `+${localTime}`);
+  phrase.forEach(tc => {
+    player.start(currentTime, tc.offset, tc.duration);
 
+    let r = Math.random() * 255;
+    let g = Math.random() * 255;
+    let b = Math.random() * 255;
+    drawCircle(r, g, b);
+    canvas.style.borderColor = `rgb(${r - 20}, ${g - 20}, ${b - 20})`;
 
-            time += tc.duration;
-          });
+    currentTime += tc.duration;
+  });
+}
 
-          Tone.Transport.start();
-        }
 
 function playNextPhrase() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);

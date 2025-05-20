@@ -62,6 +62,18 @@
 
     <script>
       /*global Tone*/
+            //source for amen sample: https://drive.google.com/drive/folders/1oh4OQITlqN8i3JfYEnI00PUcvkQK_XPi?usp=sharing
+      const amen = 'bassport_amen.wav';
+      //source for this sample: https://samplefocus.com/samples/breakcore-pad-melody
+      const ambient = 'breakcore-pad-melody_170bpm.wav';
+      //source for this sample:https://www.looperman.com/loops/detail/349921/risen-free-170bpm-ambient-synth-loop
+      const piano = 'looperman-l-2466385-0349921-risen.wav';
+      const pianosound = new Tone.Player(piano);
+      
+      const player = new Tone.Player(amen).toDestination();
+      const ambientsound = new Tone.Player(ambient);
+      
+      
       const canvas = document.getElementById('visuals');
       const ctx = canvas.getContext('2d');
 
@@ -153,13 +165,6 @@
         animate();
       }
 
-      //source for amen sample: https://drive.google.com/drive/folders/1oh4OQITlqN8i3JfYEnI00PUcvkQK_XPi?usp=sharing
-      const amen = 'bassport_amen.wav';
-      //source for this sample: https://samplefocus.com/samples/breakcore-pad-melody
-      const ambient = 'breakcore-pad-melody_170bpm.wav';
-      //source for this sample:https://www.looperman.com/loops/detail/349921/risen-free-170bpm-ambient-synth-loop
-      const piano = 'looperman-l-2466385-0349921-risen.wav';
-
       const timecodes = [{
           name: 'bass',
           offset: 0,
@@ -205,8 +210,6 @@
 
       window.addEventListener('load', async () => {
         await Tone.start();
-
-        const player = new Tone.Player(amen).toDestination();
         const effect = new Tone.Reverb({
           decay: 2,
           wet: 0.6
@@ -244,13 +247,11 @@
           }, duration * 1000);
         }
 
-        const ambientsound = new Tone.Player(ambient);
         const ambienteffect = new Tone.Reverb();
         ambientsound.connect(ambienteffect);
         ambienteffect.toDestination();
         ambientsound.loop = true;
-
-        const pianosound = new Tone.Player(piano);
+        
         const pianoeffect = new Tone.Reverb();
         pianosound.connect(pianoeffect);
         pianoeffect.toDestination();
@@ -269,20 +270,23 @@
           }
         });
 
-        document.getElementById('ambientBtn').addEventListener('click', () => {
+       let ambientStarted = false; document.getElementById('ambientBtn').addEventListener('click', () => {
           ambientOn = !ambientOn;
           const btn = document.getElementById('ambientBtn');
           btn.classList.toggle('active');
-          if (ambientOn) {
-            ambientsound.start();
-            spiralActive = true;
-            drawSpiral();
-          } else {
-            ambientsound.stop();
-            spiralActive = false;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            cancelAnimationFrame(spiralId);
-          }
+if (ambientOn && !ambientStarted) {
+  ambientsound.start();
+  ambientStarted = true;
+  spiralActive = true;
+  drawSpiral();
+} else if (!ambientOn && ambientStarted) {
+  ambientsound.stop();
+  ambientStarted = false;
+  spiralActive = false;
+  cancelAnimationFrame(spiralId);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
         });
 
  document.getElementById('pianoBtn').addEventListener('click', () => {

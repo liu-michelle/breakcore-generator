@@ -52,7 +52,7 @@
   </head>
   <body>
     <h1>infinity breakcore</h1>
-    <canvas id="visuals" width="800" height="600"></canvas>
+    <canvas id="visuals" width="1000" height="800"></canvas>
     <div>
       <button id="drumsBtn">Drums</button>
       <button id="ambientBtn">Ambient</button>
@@ -62,22 +62,25 @@
 
     <script>
       /*global Tone*/
-            //source for amen sample: https://drive.google.com/drive/folders/1oh4OQITlqN8i3JfYEnI00PUcvkQK_XPi?usp=sharing
+      //source for amen sample:https://drive.google.com/drive/folders/1oh4OQITlqN8i3JfYEnI00PUcvkQK_XPi?usp=sharing
       const amen = 'bassport_amen.wav';
+
       //source for this sample: https://samplefocus.com/samples/breakcore-pad-melody
       const ambient = 'breakcore-pad-melody_170bpm.wav';
+
       //source for this sample:https://www.looperman.com/loops/detail/349921/risen-free-170bpm-ambient-synth-loop
       const piano = 'looperman-l-2466385-0349921-risen.wav';
       const pianosound = new Tone.Player(piano);
-      
+
       const player = new Tone.Player(amen).toDestination();
       const ambientsound = new Tone.Player(ambient);
-      
-      
+
+
       const canvas = document.getElementById('visuals');
       const ctx = canvas.getContext('2d');
 
       function drawCircle(r, g, b) {
+        //base code: https://stackoverflow.com/questions/25095548/how-to-draw-a-circle-in-html5-canvas-using-javascript
         const x = canvas.width / 2 + Math.random() * 200;
         const y = canvas.height / 2 + Math.random() * 200;
         const radius = 200 * Math.random();
@@ -89,12 +92,13 @@
           ctx.arc(x, y, radius * Math.random(), 0, Math.PI * 2);
           ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
           canvas.style.borderColor = `rgb(${r -20}, ${g-20}, ${b - 20})`;
+          document.querySelector('h1').style.color = `rgb(${r -20}, ${g-20}, ${b - 20})`;
           ctx.lineWidth = 30 * Math.random();
           ctx.stroke();
           ctx.shadowColor = 'rgba(255, 0, 0, 1)';
-          ctx.shadowBlur = 5;
-          ctx.shadowOffsetX = 5;
-          ctx.shadowOffsetY = 5;
+          ctx.shadowBlur = 6;
+          ctx.shadowOffsetX = 6;
+          ctx.shadowOffsetY = 6;
           opacity -= 0.02;
           if (opacity > 0) requestAnimationFrame(animate);
         }
@@ -106,6 +110,7 @@
       let sineWaveId;
 
       function drawSineWave() {
+        // base code: https://stackoverflow.com/questions/29917446/drawing-sine-wave-in-canvas
         const amplitude = 30;
         const frequency = 0.03;
         let phase = 0;
@@ -116,11 +121,16 @@
           ctx.beginPath();
           for (let x = 0; x < canvas.width; x++) {
             const y = canvas.height / 2 + Math.sin(x * frequency + phase) * amplitude;
-            if (x === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
+            if (x === 0) {
+              ctx.moveTo(x, y);
+            }
+            else {
+              ctx.lineTo(x, y);
+            }
           }
           ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
           canvas.style.borderColor = `rgb(0, 0, 200)`;
+          document.querySelector('h1').style.color = `rgb(0, 0, 200)`;
           ctx.lineWidth = 5 * Math.random();
           ctx.stroke();
 
@@ -136,6 +146,7 @@
       let spiralId;
 
       function drawSpiral() {
+        //base code: https://stackoverflow.com/questions/6824391/drawing-a-spiral-on-an-html-canvas-using-javascript
         let angle = 0;
         let radius = 1;
         const centerX = canvas.width / 2;
@@ -153,12 +164,13 @@
             radius += 0.5;
           }
           ctx.strokeStyle = 'rgba(0, 255, 0, 0.4)';
-          ctx.lineWidth = 1.5;
+          ctx.lineWidth = 3 * Math.random();
           ctx.stroke();
           canvas.style.borderColor = `rgb(0, 200, 0)`;
+          document.querySelector('h1').style.color = `rgb(0, 200, 0)`;
 
           angle += 0.05;
-          radius = 1; // Reset radius each frame to loop properly
+          radius = 1;
           spiralId = requestAnimationFrame(animate);
         }
 
@@ -251,7 +263,7 @@
         ambientsound.connect(ambienteffect);
         ambienteffect.toDestination();
         ambientsound.loop = true;
-        
+
         const pianoeffect = new Tone.Reverb();
         pianosound.connect(pianoeffect);
         pianoeffect.toDestination();
@@ -270,26 +282,27 @@
           }
         });
 
-       let ambientStarted = false; document.getElementById('ambientBtn').addEventListener('click', () => {
+        let ambientStarted = false;
+        document.getElementById('ambientBtn').addEventListener('click', () => {
           ambientOn = !ambientOn;
           const btn = document.getElementById('ambientBtn');
           btn.classList.toggle('active');
-if (ambientOn && !ambientStarted) {
-  ambientsound.start();
-  ambientStarted = true;
-  spiralActive = true;
-  drawSpiral();
-} else if (!ambientOn && ambientStarted) {
-  ambientsound.stop();
-  ambientStarted = false;
-  spiralActive = false;
-  cancelAnimationFrame(spiralId);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
+          if (ambientOn && !ambientStarted) {
+            ambientsound.start();
+            ambientStarted = true;
+            spiralActive = true;
+            drawSpiral();
+          } else if (!ambientOn && ambientStarted) {
+            ambientsound.stop();
+            ambientStarted = false;
+            spiralActive = false;
+            cancelAnimationFrame(spiralId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
 
         });
 
- document.getElementById('pianoBtn').addEventListener('click', () => {
+        document.getElementById('pianoBtn').addEventListener('click', () => {
           pianoOn = !pianoOn;
           const btn = document.getElementById('pianoBtn');
           btn.classList.toggle('active');

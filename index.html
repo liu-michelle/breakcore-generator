@@ -56,11 +56,12 @@
     <div>
       <button id="drumsBtn">Drums</button>
       <button id="ambientBtn">Ambient</button>
-      <button id="pianoBtn">Piano</button>
+      <button id="pianoBtn">Synth</button>
     </div>
     <script src="https://unpkg.com/tone"></script>
 
     <script>
+      /*global Tone*/
       const canvas = document.getElementById('visuals');
       const ctx = canvas.getContext('2d');
 
@@ -152,9 +153,11 @@
         animate();
       }
 
-
+      //source for amen sample: https://drive.google.com/drive/folders/1oh4OQITlqN8i3JfYEnI00PUcvkQK_XPi?usp=sharing
       const amen = 'bassport_amen.wav';
+      //source for this sample: https://samplefocus.com/samples/breakcore-pad-melody
       const ambient = 'breakcore-pad-melody_170bpm.wav';
+      //source for this sample:https://www.looperman.com/loops/detail/349921/risen-free-170bpm-ambient-synth-loop
       const piano = 'looperman-l-2466385-0349921-risen.wav';
 
       const timecodes = [{
@@ -243,7 +246,6 @@
 
         const ambientsound = new Tone.Player(ambient);
         const ambienteffect = new Tone.Reverb();
-        const pitchShift = new Tone.PitchShift();
         ambientsound.connect(ambienteffect);
         ambienteffect.toDestination();
         ambientsound.loop = true;
@@ -253,7 +255,7 @@
         pianosound.connect(pianoeffect);
         pianoeffect.toDestination();
         pianosound.loop = true;
-        pianosound.volume.value = 15;
+        pianosound.volume.value = 10;
         document.getElementById('drumsBtn').addEventListener('click', () => {
           drumsOn = !drumsOn;
           const btn = document.getElementById('drumsBtn');
@@ -283,8 +285,7 @@
           }
         });
 
-
-        document.getElementById('pianoBtn').addEventListener('click', () => {
+ document.getElementById('pianoBtn').addEventListener('click', () => {
           pianoOn = !pianoOn;
           const btn = document.getElementById('pianoBtn');
           btn.classList.toggle('active');

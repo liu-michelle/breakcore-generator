@@ -26,9 +26,8 @@
       h1 {
         color: white;
         margin: 5px;
-        padding: 10px 20px;
-        border: 1px solid white;
         padding: 20px;
+        border: 1px solid white;
         box-shadow: 0 0 2px 2px rgba(255, 0, 0, 0.7);
       }
 
@@ -45,33 +44,43 @@
         border: 3px solid white;
         box-shadow: 0 0 2px 2px rgba(255, 0, 0, 0.7);
       }
+
+      button {
+        margin: 10px;
+        padding: 10px 20px;
+        background: black;
+        color: white;
+        border: 1px solid white;
+        font-family: Monaco, serif;
+        cursor: pointer;
+      }
+
+      button:hover {
+        box-shadow: 0 0 3px 3px rgba(255, 0, 0, 0.7);
+      }
+
+      button.active {
+        background: rgba(255, 0, 0, 0.7);
+      }
     </style>
   </head>
   <body>
-    <h1>inf</h1>
+    <h1>infinity breakcore</h1>
     <canvas id="visuals" width="800" height="600"></canvas>
+    <div>
+      <button id="drumsBtn">Drums</button>
+      <button id="ambientBtn">Ambient</button>
+      <button id="pianoBtn">Piano</button>
+    </div>
     <script src="https://unpkg.com/tone"></script>
-    <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js?v=1"></script>
+
     <script>
-      /*global Tone*/
-      const header = document.querySelector("h1");
-
-      header.addEventListener("mouseenter", () => {
-        document.body.style.backgroundColor = "blue";
-        document.body.style.color = "black";
-      });
-
-      header.addEventListener("mouseleave", () => {
-        document.body.style.backgroundColor = "black";
-        document.body.style.color = "white";
-      });
-
       const canvas = document.getElementById('visuals');
       const ctx = canvas.getContext('2d');
 
       function drawCircle(r, g, b) {
-        const x = canvas.width / 2 + (Math.random()) * 200;
-        const y = canvas.height / 2 + (Math.random()) * 200;
+        const x = canvas.width / 2 + Math.random() * 200;
+        const y = canvas.height / 2 + Math.random() * 200;
         const radius = 200 * Math.random();
         let opacity = 1;
 
@@ -80,13 +89,13 @@
           ctx.beginPath();
           ctx.arc(x, y, radius * Math.random(), 0, Math.PI * 2);
           ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+          canvas.style.borderColor = `rgb(${r -20}, ${g-20}, ${b - 20})`;
           ctx.lineWidth = 30 * Math.random();
           ctx.stroke();
           ctx.shadowColor = 'rgba(255, 0, 0, 1)';
           ctx.shadowBlur = 5;
           ctx.shadowOffsetX = 5;
           ctx.shadowOffsetY = 5;
-
           opacity -= 0.02;
           if (opacity > 0) requestAnimationFrame(animate);
         }
@@ -94,34 +103,74 @@
         animate();
       }
 
-      function squares() {
-        const x = canvas.width / 2 + (Math.random()) * 200;
-        const y = canvas.height / 2 + (Math.random()) * 200;
-        const radius = 150 * Math.random();
-        let opacity = 1;
+      let sineWaveActive = false;
+      let sineWaveId;
+
+      function drawSineWave() {
+        const amplitude = 30;
+        const frequency = 0.03;
+        let phase = 0;
 
         function animate() {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.beginPath();
-          ctx.arc(x, y, radius, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(200,200,200,${opacity})`;
-          ctx.lineWidth = 30;
-          ctx.fill();
-          ctx.shadowColor = 'rgba(255, 0, 0, 1)';
-          ctx.shadowBlur = 5;
-          ctx.shadowOffsetX = 5;
-          ctx.shadowOffsetY = 5;
+          if (!sineWaveActive) return;
 
-          opacity -= 0.02;
-          if (opacity > 0) requestAnimationFrame(animate);
+          ctx.beginPath();
+          for (let x = 0; x < canvas.width; x++) {
+            const y = canvas.height / 2 + Math.sin(x * frequency + phase) * amplitude;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
+          canvas.style.borderColor = `rgb(0, 0, 200)`;
+          ctx.lineWidth = 5 * Math.random();
+          ctx.stroke();
+
+          phase += 0.05;
+
+          sineWaveId = requestAnimationFrame(animate);
         }
 
         animate();
       }
 
+      let spiralActive = false;
+      let spiralId;
+
+      function drawSpiral() {
+        let angle = 0;
+        let radius = 1;
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        function animate() {
+          if (!spiralActive) return;
+
+          ctx.beginPath();
+          for (let i = 0; i < 300; i++) {
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            ctx.lineTo(x, y);
+            angle += 0.1;
+            radius += 0.5;
+          }
+          ctx.strokeStyle = 'rgba(0, 255, 0, 0.4)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          canvas.style.borderColor = `rgb(0, 200, 0)`;
+
+          angle += 0.05;
+          radius = 1; // Reset radius each frame to loop properly
+          spiralId = requestAnimationFrame(animate);
+        }
+
+        animate();
+      }
+
+
+      const amen = 'bassport_amen.wav';
       const ambient = 'breakcore-pad-melody_170bpm.wav';
       const piano = 'looperman-l-2466385-0349921-risen.wav';
-      const amen = 'bassport_amen.wav';
+
       const timecodes = [{
           name: 'bass',
           offset: 0,
@@ -167,54 +216,23 @@
 
       window.addEventListener('load', async () => {
         await Tone.start();
+
+        const player = new Tone.Player(amen).toDestination();
         const effect = new Tone.Reverb({
           decay: 2,
           wet: 0.6
         });
-        const player = new Tone.Player(amen, () => {
-          playNextPhrase();
-        });
-        player.volume.value = -5;
         player.connect(effect);
         effect.toDestination();
+        player.volume.value = -5;
 
-        let pitch = 0;
-        const ambientsound = new Tone.Player(ambient);
-        const ambienteffect = new Tone.Reverb();
-        const pitchShift = new Tone.PitchShift(pitch);
+        let drumsOn = false;
+        let ambientOn = false;
+        let pianoOn = false;
+        let phraseTimeout;
 
-        ambientsound.connect(ambienteffect);
-        ambienteffect.connect(pitchShift);
-        pitchShift.toDestination();
-        const loopDuration = 6;
-
-        const loop = new Tone.Loop(time => {
-          ambientsound.start(time);
-          Tone.Transport.scheduleRepeat(time => {
-             squares();
-          }, "1n");
-        }, `${loopDuration}`);
-
-        loop.start(0);
-        Tone.Transport.start();
-        ambientsound.volume.value = -3;
-
-        setInterval(() => {
-          if (pitchShift.pitch > 2) {
-            pitchShift.pitch = 0;
-          }
-          pitchShift.pitch += 1;
-        }, 4000);
-        
-        const pianosound = new Tone.Player(piano).toDestination();
-        pianosound.loop = true;
-        pianosound.autostart = true;
-        pianosound.volume.value = 10;
-        function getPhraseDuration(pattern) {
-          return getPatternTimecodes(pattern).reduce((sum, tc) => sum + tc.duration, 0);
-        }
-
-        function playPhrase(pattern) {
+        function playPhrase() {
+          const pattern = patterns[Math.floor(Math.random() * patterns.length)];
           const phrase = getPatternTimecodes(pattern);
           let time = 0;
 
@@ -222,29 +240,80 @@
             const localTime = time;
             Tone.Transport.schedule((t) => {
               player.start(t, tc.offset, tc.duration);
-              let r = Math.random() * 255;
-              let g = Math.random() * 255;
-              let b = Math.random() * 255;
+              const r = Math.random() * 255;
+              const g = Math.random() * 255;
+              const b = Math.random() * 255;
               drawCircle(r, g, b);
-              canvas.style.borderColor = `rgb(${r -20}, ${g-20}, ${b - 20})`;
             }, `+${localTime}`);
-
-
             time += tc.duration;
           });
 
           Tone.Transport.start();
+          const duration = phrase.reduce((sum, tc) => sum + tc.duration, 0);
+          phraseTimeout = setTimeout(() => {
+            if (drumsOn) playPhrase();
+          }, duration * 1000);
         }
 
-        function playNextPhrase() {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          const randomIndex = Math.floor(Math.random() * patterns.length);
-          const phrase = patterns[randomIndex];
-          playPhrase(phrase);
+        const ambientsound = new Tone.Player(ambient);
+        const ambienteffect = new Tone.Reverb();
+        const pitchShift = new Tone.PitchShift();
+        ambientsound.connect(ambienteffect);
+        ambienteffect.toDestination();
+        ambientsound.loop = true;
 
-          const phraseDuration = getPhraseDuration(phrase);
-          setTimeout(playNextPhrase, phraseDuration * 1000);
-        }
+        const pianosound = new Tone.Player(piano);
+        const pianoeffect = new Tone.Reverb();
+        pianosound.connect(pianoeffect);
+        pianoeffect.toDestination();
+        pianosound.loop = true;
+        pianosound.volume.value = 15;
+        document.getElementById('drumsBtn').addEventListener('click', () => {
+          drumsOn = !drumsOn;
+          const btn = document.getElementById('drumsBtn');
+          btn.classList.toggle('active');
+          if (drumsOn) {
+            playPhrase();
+          } else {
+            Tone.Transport.cancel();
+            Tone.Transport.stop();
+            clearTimeout(phraseTimeout);
+          }
+        });
+
+        document.getElementById('ambientBtn').addEventListener('click', () => {
+          ambientOn = !ambientOn;
+          const btn = document.getElementById('ambientBtn');
+          btn.classList.toggle('active');
+          if (ambientOn) {
+            ambientsound.start();
+            spiralActive = true;
+            drawSpiral();
+          } else {
+            ambientsound.stop();
+            spiralActive = false;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            cancelAnimationFrame(spiralId);
+          }
+        });
+
+
+        document.getElementById('pianoBtn').addEventListener('click', () => {
+          pianoOn = !pianoOn;
+          const btn = document.getElementById('pianoBtn');
+          btn.classList.toggle('active');
+          if (pianoOn) {
+            pianosound.start();
+            sineWaveActive = true;
+            drawSineWave();
+          } else {
+            pianosound.stop();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            sineWaveActive = false;
+            cancelAnimationFrame(sineWaveId);
+          }
+        });
+
       });
     </script>
   </body>

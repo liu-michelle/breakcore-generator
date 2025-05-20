@@ -83,7 +83,8 @@
       let ambientStarted = false, phraseTimeout;
       let sineWaveActive = false, sineAnimation;
       let spiralActive = false, spiralAnimation;
-
+      
+      let drawCircles = true;
       function drawCircle(r, g, b) {
         //base code: https://stackoverflow.com/questions/25095548/how-to-draw-a-circle-in-html5-canvas-using-javascript
         const x = canvas.width / 2 + Math.random() * 200;
@@ -93,6 +94,7 @@
 
         function animate() {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
+          if (drawCircles === false) return;
           ctx.beginPath();
           ctx.arc(x, y, radius * Math.random(), 0, Math.PI * 2);
           ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
@@ -265,21 +267,24 @@
           }, duration * 1000);
         }
 
-        document.getElementById('drumsButton').addEventListener('click', () => {
-          drumsOn = !drumsOn;
-          const btn = document.getElementById('drumsButton');
-          btn.classList.toggle('red');
-          if (drumsOn) {
-            playPhrase();
-          } else {
-            Tone.Transport.cancel();
-            Tone.Transport.stop();
-            clearTimeout(phraseTimeout);
-            canvas.style.borderColor = `rgb(255, 255, 255)`;
-            document.querySelector('h1').style.color = `rgb(255, 255, 255)`;
-            document.body.style.backgroundColor = 'rgb(0, 0, 0)';
-          }
-        });
+document.getElementById('drumsButton').addEventListener('click', () => {
+  drumsOn = !drumsOn;
+  const btn = document.getElementById('drumsButton');
+  btn.classList.toggle('red');
+  if (drumsOn) {
+    drawCircles = true;
+    playPhrase();
+  } else {
+    drawCircles = false;
+    Tone.Transport.cancel();
+    Tone.Transport.stop();
+    clearTimeout(phraseTimeout);
+    canvas.style.borderColor = `rgb(255, 255, 255)`;
+    document.querySelector('h1').style.color = `rgb(255, 255, 255)`;
+    document.body.style.backgroundColor = 'rgb(0, 0, 0)';
+  }
+});
+
 
         document.getElementById('ambientButton').addEventListener('click', () => {
           ambientOn = !ambientOn;

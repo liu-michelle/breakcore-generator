@@ -44,19 +44,19 @@
       button:hover {
         box-shadow: 0 0 3px 3px rgba(255, 0, 0, 0.7);
       }
-
-      button.active {
+      
+      button.red {
         background: rgba(255, 0, 0, 0.7);
       }
     </style>
   </head>
   <body>
     <h1>infinity breakcore</h1>
-    <canvas id="visuals" width="1000" height="800"></canvas>
+    <canvas id="visuals" width="800" height="600"></canvas>
     <div>
-      <button id="drumsBtn">Drums</button>
-      <button id="ambientBtn">Ambient</button>
-      <button id="pianoBtn">Synth</button>
+      <button id="drumsButton">Drums</button>
+      <button id="ambientButton">Ambient</button>
+      <button id="pianoButton">Synth</button>
     </div>
     <script src="https://unpkg.com/tone"></script>
 
@@ -100,14 +100,18 @@
           ctx.shadowOffsetX = 6;
           ctx.shadowOffsetY = 6;
           opacity -= 0.02;
-          if (opacity > 0) requestAnimationFrame(animate);
+          if (opacity > 0) {
+            requestAnimationFrame(animate);
+          }
         }
 
         animate();
       }
 
       let sineWaveActive = false;
-      let sineWaveId;
+      let sineAnimation;
+      let spiralActive = false;
+      let spiralAnimation;
 
       function drawSineWave() {
         // base code: https://stackoverflow.com/questions/29917446/drawing-sine-wave-in-canvas
@@ -136,14 +140,11 @@
 
           phase += 0.05;
 
-          sineWaveId = requestAnimationFrame(animate);
+          sineAnimation = requestAnimationFrame(animate);
         }
 
         animate();
       }
-
-      let spiralActive = false;
-      let spiralId;
 
       function drawSpiral() {
         //base code: https://stackoverflow.com/questions/6824391/drawing-a-spiral-on-an-html-canvas-using-javascript
@@ -171,7 +172,7 @@
 
           angle += 0.05;
           radius = 1;
-          spiralId = requestAnimationFrame(animate);
+          spiralAnimation = requestAnimationFrame(animate);
         }
 
         animate();
@@ -215,10 +216,21 @@
         ["snare", "snare", "snare", "snare1", "kick", "snare1", "kick", "kick"],
         ["cymbal", "cymbal", "kick", "snare", "kick", "snare", "cymbal", "bass"]
       ];
+      
+function getPatternTimecodes(pattern) {
+  const result = [];
 
-      function getPatternTimecodes(pattern) {
-        return pattern.map(name => timecodes.find(tc => tc.name === name));
+  for (let i = 0; i < pattern.length; i++) {
+    const name = pattern[i];
+    for (let j = 0; j < timecodes.length; j++) {
+      if (timecodes[j].name === name) {
+        result.push(timecodes[j]);
+        break;
       }
+    }
+  }
+  return result;
+}
 
       window.addEventListener('load', async () => {
         await Tone.start();
@@ -255,7 +267,9 @@
           Tone.Transport.start();
           const duration = phrase.reduce((sum, tc) => sum + tc.duration, 0);
           phraseTimeout = setTimeout(() => {
-            if (drumsOn) playPhrase();
+            if (drumsOn) {
+              playPhrase();
+            }
           }, duration * 1000);
         }
 
@@ -269,13 +283,14 @@
         pianoeffect.toDestination();
         pianosound.loop = true;
         pianosound.volume.value = 10;
-        document.getElementById('drumsBtn').addEventListener('click', () => {
+        document.getElementById('drumsButton').addEventListener('click', () => {
           drumsOn = !drumsOn;
-          const btn = document.getElementById('drumsBtn');
-          btn.classList.toggle('active');
+          const btn = document.getElementById('drumsButton');
+          btn.classList.toggle('red');
           if (drumsOn) {
             playPhrase();
-          } else {
+          } 
+          else {
             Tone.Transport.cancel();
             Tone.Transport.stop();
             clearTimeout(phraseTimeout);
@@ -283,38 +298,40 @@
         });
 
         let ambientStarted = false;
-        document.getElementById('ambientBtn').addEventListener('click', () => {
+        document.getElementById('ambientButton').addEventListener('click', () => {
           ambientOn = !ambientOn;
-          const btn = document.getElementById('ambientBtn');
-          btn.classList.toggle('active');
+          const btn = document.getElementById('ambientButton');
+          btn.classList.toggle('red');
           if (ambientOn && !ambientStarted) {
             ambientsound.start();
             ambientStarted = true;
             spiralActive = true;
             drawSpiral();
-          } else if (!ambientOn && ambientStarted) {
+          } 
+          else if (!ambientOn && ambientStarted) {
             ambientsound.stop();
             ambientStarted = false;
             spiralActive = false;
-            cancelAnimationFrame(spiralId);
+            cancelAnimationFrame(spiralAnimation);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
           }
 
         });
 
-        document.getElementById('pianoBtn').addEventListener('click', () => {
+        document.getElementById('pianoButton').addEventListener('click', () => {
           pianoOn = !pianoOn;
-          const btn = document.getElementById('pianoBtn');
-          btn.classList.toggle('active');
+          const btn = document.getElementById('pianoButton');
+          btn.classList.toggle('red');
           if (pianoOn) {
             pianosound.start();
             sineWaveActive = true;
             drawSineWave();
-          } else {
+          } 
+          else {
             pianosound.stop();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             sineWaveActive = false;
-            cancelAnimationFrame(sineWaveId);
+            cancelAnimationFrame(sineAnimation);
           }
         });
 

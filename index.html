@@ -44,7 +44,7 @@
       button:hover {
         box-shadow: 0 0 3px 3px rgba(255, 0, 0, 0.7);
       }
-      
+
       button.red {
         background: rgba(255, 0, 0, 0.7);
       }
@@ -127,8 +127,7 @@
             const y = canvas.height / 2 + Math.sin(x * frequency + phase) * amplitude;
             if (x === 0) {
               ctx.moveTo(x, y);
-            }
-            else {
+            } else {
               ctx.lineTo(x, y);
             }
           }
@@ -216,21 +215,21 @@
         ["snare", "snare", "snare", "snare1", "kick", "snare1", "kick", "kick"],
         ["cymbal", "cymbal", "kick", "snare", "kick", "snare", "cymbal", "bass"]
       ];
-      
-function getPatternTimecodes(pattern) {
-  const result = [];
 
-  for (let i = 0; i < pattern.length; i++) {
-    const name = pattern[i];
-    for (let j = 0; j < timecodes.length; j++) {
-      if (timecodes[j].name === name) {
-        result.push(timecodes[j]);
-        break;
+      function getPatternTimecodes(pattern) {
+        const result = [];
+
+        for (let i = 0; i < pattern.length; i++) {
+          const name = pattern[i];
+          for (let j = 0; j < timecodes.length; j++) {
+            if (timecodes[j].name === name) {
+              result.push(timecodes[j]);
+              break;
+            }
+          }
+        }
+        return result;
       }
-    }
-  }
-  return result;
-}
 
       window.addEventListener('load', async () => {
         await Tone.start();
@@ -289,8 +288,7 @@ function getPatternTimecodes(pattern) {
           btn.classList.toggle('red');
           if (drumsOn) {
             playPhrase();
-          } 
-          else {
+          } else {
             Tone.Transport.cancel();
             Tone.Transport.stop();
             clearTimeout(phraseTimeout);
@@ -307,8 +305,7 @@ function getPatternTimecodes(pattern) {
             ambientStarted = true;
             spiralActive = true;
             drawSpiral();
-          } 
-          else if (!ambientOn && ambientStarted) {
+          } else if (!ambientOn && ambientStarted) {
             ambientsound.stop();
             ambientStarted = false;
             spiralActive = false;
@@ -326,8 +323,7 @@ function getPatternTimecodes(pattern) {
             pianosound.start();
             sineWaveActive = true;
             drawSineWave();
-          } 
-          else {
+          } else {
             pianosound.stop();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             sineWaveActive = false;

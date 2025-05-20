@@ -93,6 +93,7 @@
           ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
           canvas.style.borderColor = `rgb(${r -20}, ${g-20}, ${b - 20})`;
           document.querySelector('h1').style.color = `rgb(${r -20}, ${g-20}, ${b - 20})`;
+          document.body.style.backgroundColor = `rgb(${r -240}, ${g-240}, ${b - 240})`;
           ctx.lineWidth = 30 * Math.random();
           ctx.stroke();
           ctx.shadowColor = 'rgba(255, 0, 0, 1)';
@@ -134,6 +135,7 @@
           ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
           canvas.style.borderColor = `rgb(0, 0, 200)`;
           document.querySelector('h1').style.color = `rgb(0, 0, 200)`;
+          document.body.style.backgroundColor = 'rgb(0, 0, 15)';
           ctx.lineWidth = 5 * Math.random();
           ctx.stroke();
 
@@ -168,6 +170,7 @@
           ctx.stroke();
           canvas.style.borderColor = `rgb(0, 200, 0)`;
           document.querySelector('h1').style.color = `rgb(0, 200, 0)`;
+          document.body.style.backgroundColor = 'rgb(0, 15, 0)';
 
           angle += 0.05;
           radius = 1;
@@ -292,6 +295,9 @@
             Tone.Transport.cancel();
             Tone.Transport.stop();
             clearTimeout(phraseTimeout);
+            canvas.style.borderColor = `rgb(255, 255, 255)`;
+            document.querySelector('h1').style.color = `rgb(255, 255, 255)`;
+            document.body.style.backgroundColor = 'rgb(0, 0, 0)';
           }
         });
 
@@ -311,6 +317,9 @@
             spiralActive = false;
             cancelAnimationFrame(spiralAnimation);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.borderColor = `rgb(255, 255, 255)`;
+            document.querySelector('h1').style.color = `rgb(255, 255, 255)`;
+            document.body.style.backgroundColor = 'rgb(0, 0, 0)';
           }
 
         });
@@ -328,6 +337,9 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             sineWaveActive = false;
             cancelAnimationFrame(sineAnimation);
+            canvas.style.borderColor = `rgb(255, 255, 255)`;
+            document.querySelector('h1').style.color = `rgb(255, 255, 255)`;
+            document.body.style.backgroundColor = 'rgb(0, 0, 0)';
           }
         });
 

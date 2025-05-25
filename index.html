@@ -25,10 +25,7 @@
 
       canvas {
         display: block;
-        margin: 20px auto;
         background: rgba(255, 255, 255, 0);
-        border: 3px solid white;
-        box-shadow: 0 0 2px 2px rgba(255, 0, 0, 0.7);
       }
 
       button {
@@ -56,7 +53,7 @@
   </head>
   <body>
     <h1>infinity breakcore</h1>
-    <canvas id="visuals" width="800" height="600"></canvas>
+    <canvas id="visuals"></canvas>
     <div>
       <button id="drumsButton">Drums</button>
       <button id="ambientButton">Ambient</button>
@@ -78,6 +75,14 @@
       const canvas = document.getElementById('visuals');
       const ctx = canvas.getContext('2d');
 
+function custom() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+custom();
+window.addEventListener('resize', custom);
+
+
       let player, ambientsound, pianosound;
       let drumsOn = false, ambientOn = false, pianoOn = false;
       let ambientStarted = false, phraseTimeout;
@@ -93,7 +98,7 @@
         let opacity = 1;
 
         function animate() {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          //ctx.clearRect(0, 0, canvas.width, canvas.height);
           if (drawCircles === false) return;
           ctx.beginPath();
           ctx.arc(x, y, radius * Math.random(), 0, Math.PI * 2);

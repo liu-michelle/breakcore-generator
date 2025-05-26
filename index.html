@@ -26,29 +26,28 @@
       canvas {
         display: block;
         background: rgba(255, 255, 255, 0);
+        transition: transform 0.5s ease;
       }
 
       button {
-        margin: 10px;
+        margin: 5px;
+        border: 1px white;
         padding: 10px 20px;
         background: black;
         color: white;
-        border: 1px solid white;
         font-family: Monaco, serif;
         cursor: pointer;
       }
 
       button:hover {
         box-shadow: 0 0 3px 3px rgba(255, 0, 0, 0.7);
-      }
-
-      button.red {
-        background: rgba(255, 0, 0, 0.7);
+        color: rgba(255, 0, 0, 1);
       }
 
       h1 {
-        text-decoration: solid underline;
+        text-shadow: 2px 2px rgba(255, 0, 0, 0.7);
       }
+
     </style>
   </head>
   <body>
@@ -75,37 +74,62 @@
       const canvas = document.getElementById('visuals');
       const ctx = canvas.getContext('2d');
 
-function custom() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-custom();
-window.addEventListener('resize', custom);
+      //making the canvas custom to the width and height of the device
+      function custom() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      custom();
+      window.addEventListener('resize', custom);
 
+function scaleCanvasBasedOnState() {
+  let scale = 0.5;
+  if (drumsOn && ambientOn && pianoOn) {
+    scale = 1;
+  } else if (drumsOn || ambientOn || pianoOn) {
+    scale = 0.7;
+  } else {
+    scale = 0.5;
+  }
+
+  canvas.style.transform = `scale(${scale})`;
+}
 
       let player, ambientsound, pianosound;
-      let drumsOn = false, ambientOn = false, pianoOn = false;
-      let ambientStarted = false, phraseTimeout;
-      let sineWaveActive = false, sineAnimation;
-      let spiralActive = false, spiralAnimation;
-      
+      let drumsOn = false,
+        ambientOn = false,
+        pianoOn = false;
+      let phraseTimeout;
+      let sineWaveActive = false,
+        sineAnimation;
+      let spiralActive = false,
+        spiralAnimation;
+      document.addEventListener('mousemove', function(event) {
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+      });
       let drawCircles = true;
+
       function drawCircle(r, g, b) {
         //base code: https://stackoverflow.com/questions/25095548/how-to-draw-a-circle-in-html5-canvas-using-javascript
-        const x = canvas.width / 2 + Math.random() * 200;
-        const y = canvas.height / 2 + Math.random() * 200;
-        const radius = 200 * Math.random();
+        const x = canvas.width * Math.random();
+        //const x = mouseX;
+        //const y = mouseY;
+        const y = canvas.height * Math.random();
+        const radius = 250 * Math.random();
         let opacity = 1;
 
         function animate() {
-          //ctx.clearRect(0, 0, canvas.width, canvas.height);
+          if (pianoOn === false & ambientOn === false) {
+                      ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
           if (drawCircles === false) return;
           ctx.beginPath();
           ctx.arc(x, y, radius * Math.random(), 0, Math.PI * 2);
           ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
-          canvas.style.borderColor = `rgb(${r -20}, ${g-20}, ${b - 20})`;
-          document.querySelector('h1').style.color = `rgb(${r -20}, ${g-20}, ${b - 20})`;
-          document.body.style.backgroundColor = `rgb(${r -230}, ${g-230}, ${b - 230})`;
+          document.querySelector('h1').style.color = `rgb(${r}, ${g}, ${b})`;
+          document.getElementById('drumsButton').style.background = `rgb(${r -20}, ${g-20}, ${b - 20})`;
+          document.body.style.backgroundColor = `2px 2px rgb(${r -230}, ${g-230}, ${b - 230})`;
           ctx.lineWidth = 30 * Math.random();
           ctx.stroke();
           ctx.shadowColor = 'rgba(255, 0, 0, 1)';
@@ -140,8 +164,8 @@ window.addEventListener('resize', custom);
             }
           }
           ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
-          canvas.style.borderColor = `rgb(0, 0, 200)`;
-          document.querySelector('h1').style.color = `rgb(0, 0, 200)`;
+          document.querySelector('h1').style.color = `rgb(0, 0, 255)`;
+          document.getElementById('pianoButton').style.background = `rgb(0,0,200)`;
           document.body.style.backgroundColor = 'rgb(0, 0, 15)';
           ctx.lineWidth = 5 * Math.random();
           ctx.stroke();
@@ -175,10 +199,9 @@ window.addEventListener('resize', custom);
           ctx.strokeStyle = 'rgba(0, 255, 0, 0.4)';
           ctx.lineWidth = 3 * Math.random();
           ctx.stroke();
-          canvas.style.borderColor = `rgb(0, 200, 0)`;
-          document.querySelector('h1').style.color = `rgb(0, 200, 0)`;
+          document.querySelector('h1').style.color = `rgb(0, 255, 0)`;
           document.body.style.backgroundColor = 'rgb(0, 15, 0)';
-
+          document.getElementById('ambientButton').style.background = `rgb(0,200,0)`;
           angle += 0.05;
           radius = 1;
           spiralAnimation = requestAnimationFrame(animate);
@@ -187,12 +210,31 @@ window.addEventListener('resize', custom);
         animate();
       }
 
-      const timecodes = [
-        { name: 'bass', offset: 0, duration: 0.168 },
-        { name: 'kick', offset: 0.347, duration: 0.176 },
-        { name: 'snare', offset: 0.519, duration: 0.879 },
-        { name: 'cymbal', offset: 2.792, duration: 0.332 },
-        { name: 'snare1', offset: 4.545, duration: 1.066 }
+      const timecodes = [{
+          name: 'bass',
+          offset: 0,
+          duration: 0.168
+        },
+        {
+          name: 'kick',
+          offset: 0.347,
+          duration: 0.176
+        },
+        {
+          name: 'snare',
+          offset: 0.519,
+          duration: 0.879
+        },
+        {
+          name: 'cymbal',
+          offset: 2.792,
+          duration: 0.332
+        },
+        {
+          name: 'snare1',
+          offset: 4.545,
+          duration: 1.066
+        }
       ];
 
       const patterns = [
@@ -230,7 +272,10 @@ window.addEventListener('resize', custom);
         ambientsound = new Tone.Player(ambient);
         pianosound = new Tone.Player(piano);
 
-        const effect = new Tone.Reverb({ decay: 2, wet: 0.6 });
+        const effect = new Tone.Reverb({
+          decay: 2,
+          wet: 0.6
+        });
         player.connect(effect);
         effect.toDestination();
         player.volume.value = -5;
@@ -272,50 +317,46 @@ window.addEventListener('resize', custom);
           }, duration * 1000);
         }
 
-document.getElementById('drumsButton').addEventListener('click', () => {
-  drumsOn = !drumsOn;
-  const btn = document.getElementById('drumsButton');
-  btn.classList.toggle('red');
-  if (drumsOn) {
-    drawCircles = true;
-    playPhrase();
-  } else {
-    drawCircles = false;
-    Tone.Transport.cancel();
-    Tone.Transport.stop();
-    clearTimeout(phraseTimeout);
-    canvas.style.borderColor = `rgb(255, 255, 255)`;
-    document.querySelector('h1').style.color = `rgb(255, 255, 255)`;
-    document.body.style.backgroundColor = 'rgb(0, 0, 0)';
-  }
-});
+        document.getElementById('drumsButton').addEventListener('click', () => {
+          drumsOn = !drumsOn;
+          scaleCanvasBasedOnState();
+          if (drumsOn) {
+            drawCircles = true;
+            playPhrase();
+          } else {
+            drawCircles = false;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            Tone.Transport.cancel();
+            Tone.Transport.stop();
+            clearTimeout(phraseTimeout);
+            document.querySelector('h1').style.color = `rgb(255, 255, 255)`;
+            document.body.style.backgroundColor = 'rgb(0, 0, 0)';
+            document.getElementById('drumsButton').style.background = `rgb(0,0,0)`;
+          }
+        });
 
 
         document.getElementById('ambientButton').addEventListener('click', () => {
           ambientOn = !ambientOn;
-          const btn = document.getElementById('ambientButton');
-          btn.classList.toggle('red');
-          if (ambientOn && !ambientStarted) {
+          scaleCanvasBasedOnState();
+          if (ambientOn) {
             ambientsound.start();
-            ambientStarted = true;
             spiralActive = true;
             drawSpiral();
-          } else if (!ambientOn && ambientStarted) {
+          } else if (!ambientOn) {
             ambientsound.stop();
-            ambientStarted = false;
             spiralActive = false;
             cancelAnimationFrame(spiralAnimation);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            canvas.style.borderColor = `rgb(255, 255, 255)`;
             document.querySelector('h1').style.color = `rgb(255, 255, 255)`;
             document.body.style.backgroundColor = 'rgb(0, 0, 0)';
+            document.getElementById('ambientButton').style.background = `rgb(0,0,0)`;
           }
         });
 
         document.getElementById('pianoButton').addEventListener('click', () => {
           pianoOn = !pianoOn;
-          const btn = document.getElementById('pianoButton');
-          btn.classList.toggle('red');
+          scaleCanvasBasedOnState();
           if (pianoOn) {
             pianosound.start();
             sineWaveActive = true;
@@ -325,9 +366,9 @@ document.getElementById('drumsButton').addEventListener('click', () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             sineWaveActive = false;
             cancelAnimationFrame(sineAnimation);
-            canvas.style.borderColor = `rgb(255, 255, 255)`;
             document.querySelector('h1').style.color = `rgb(255, 255, 255)`;
             document.body.style.backgroundColor = 'rgb(0, 0, 0)';
+            document.getElementById('pianoButton').style.background = `rgb(0,0,0)`;
           }
         });
       });

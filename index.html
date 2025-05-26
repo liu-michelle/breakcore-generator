@@ -27,6 +27,7 @@
         display: block;
         background: rgba(255, 255, 255, 0);
         transition: transform 0.5s ease;
+        border: 1px solid white;
       }
 
       button {
@@ -83,7 +84,7 @@
       window.addEventListener('resize', custom);
 
 function scale() {
-  let scale = 0.5;
+  let scale = 0.6;
   
   if (drumsOn && ambientOn && pianoOn) {
     scale = 1;
@@ -94,7 +95,7 @@ function scale() {
   ) {
     scale = 0.8;
   } else {
-    scale = 0.5;
+    scale = 0.6;
   }
 
   canvas.style.transform = `scale(${scale})`;
@@ -110,7 +111,7 @@ function scale() {
       let spiralActive = false,
         spiralAnimation;
       let mouseX = canvas.width / 2;
-       let mouseY = canvas.height / 2;
+       let mouseY = canvas.height / 2; 
       document.addEventListener('mousemove', function(event) {
         mouseX = event.clientX;
         mouseY = event.clientY;
@@ -135,6 +136,7 @@ function scale() {
           document.querySelector('h1').style.color = `rgb(${r}, ${g}, ${b})`;
           document.getElementById('drumsButton').style.background = `rgb(${r -20}, ${g-20}, ${b - 20})`;
           document.body.style.backgroundColor = `2px 2px rgb(${r -230}, ${g-230}, ${b - 230})`;
+          canvas.style.borderColor = `rgb(${r -20}, ${g-20}, ${b - 20})`;
           ctx.lineWidth = 30 * Math.random();
           ctx.stroke();
           ctx.shadowColor = 'rgba(255, 0, 0, 1)';
@@ -170,7 +172,7 @@ function scale() {
           }
           ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
           document.querySelector('h1').style.color = `rgb(0, 0, 255)`;
-          document.getElementById('pianoButton').style.background = `rgb(0,0,200)`;
+         canvas.style.borderColor = `rgb(0, 0, 200)`; document.getElementById('pianoButton').style.background = `rgb(0,0,200)`;
           document.body.style.backgroundColor = 'rgb(0, 0, 15)';
           ctx.lineWidth = 5 * Math.random();
           ctx.stroke();
@@ -206,7 +208,7 @@ function scale() {
           ctx.stroke();
           document.querySelector('h1').style.color = `rgb(0, 255, 0)`;
           document.body.style.backgroundColor = 'rgb(0, 15, 0)';
-          document.getElementById('ambientButton').style.background = `rgb(0,200,0)`;
+         canvas.style.borderColor = `rgb(0, 200, 0)`; document.getElementById('ambientButton').style.background = `rgb(0,200,0)`;
           angle += 0.05;
           radius = 1;
           spiralAnimation = requestAnimationFrame(animate);
@@ -280,7 +282,7 @@ function scale() {
         const effect = new Tone.Reverb({
           decay: 2,
           wet: 0.6
-        });
+        })
         player.connect(effect);
         effect.toDestination();
         player.volume.value = -5;
@@ -310,6 +312,11 @@ function scale() {
               const b = Math.random() * 255;
               drawCircle(r, g, b);
             }, `+${localTime}`);
+              if (    (drumsOn && ambientOn) ||
+    (drumsOn && pianoOn) ||
+    (ambientOn && pianoOn)) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
             time += tc.duration;
           });
 
